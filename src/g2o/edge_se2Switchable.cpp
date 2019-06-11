@@ -3,11 +3,13 @@
  *
  *  Created on: 13.07.2011
  *      Author: niko
+ *
+ *  Updated on: 14.01.2013
+ *      Author: Christian Kerl <christian.kerl@in.tum.de>
  */
 
 #include "edge_se2Switchable.h"
 #include "vertex_switchLinear.h"
-#include <GL/gl.h>
 
 using namespace std;
 using namespace Eigen;
@@ -17,9 +19,10 @@ using namespace Eigen;
 EdgeSE2Switchable::EdgeSE2Switchable() : g2o::BaseMultiEdge<3, g2o::SE2>()
 {
   resize(3);
-  _jacobianOplus[0].resize(3,3);    
-  _jacobianOplus[1].resize(3,3);
-  _jacobianOplus[2].resize(3,1); 
+  _jacobianOplus.clear();
+  _jacobianOplus.push_back(JacobianType(0, 3, 3));
+  _jacobianOplus.push_back(JacobianType(0, 3, 3));
+  _jacobianOplus.push_back(JacobianType(0, 3, 1));
 
 }
 // ================================================
@@ -27,8 +30,9 @@ bool EdgeSE2Switchable::read(std::istream& is)
   {
     Vector3d p;
     is >> p[0] >> p[1] >> p[2];
-    measurement().fromVector(p);
-    inverseMeasurement() = measurement().inverse();
+    setMeasurement(g2o::SE2(p));
+    _inverseMeasurement = measurement().inverse();
+
     for (int i = 0; i < 3; ++i)
       for (int j = i; j < 3; ++j) {
         is >> information()(i, j);
@@ -69,13 +73,12 @@ void EdgeSE2Switchable::linearizeOplus()
     _jacobianOplus[1](1, 0) =-si; _jacobianOplus[1](1, 1)= ci; _jacobianOplus[1](1, 2)= 0;
     _jacobianOplus[1](2, 0) = 0;  _jacobianOplus[1](2, 1)= 0;  _jacobianOplus[1](2, 2)= 1;
 
-    const g2o::SE2& rmean = inverseMeasurement();
+    const g2o::SE2& rmean = _inverseMeasurement;
     Matrix3d z = Matrix3d::Zero();
     z.block<2, 2>(0, 0) = rmean.rotation().toRotationMatrix();
     z(2, 2) = 1.;
     _jacobianOplus[0] = z * _jacobianOplus[0];
     _jacobianOplus[1] = z * _jacobianOplus[1];
-
 
 
     _jacobianOplus[0]*=vSwitch->estimate();
@@ -85,10 +88,8 @@ void EdgeSE2Switchable::linearizeOplus()
     // derivative w.r.t switch vertex
     _jacobianOplus[2].setZero();
     g2o::SE2 delta = _inverseMeasurement * (vi->estimate().inverse()*vj->estimate());
-    _jacobianOplus[2] = delta.toVector() * vSwitch->gradient();
-  
+    _jacobianOplus[2] = delta.toVector() * vSwitch->gradient();  
 }
-
 
 // ================================================
 void EdgeSE2Switchable::computeError()
@@ -102,11 +103,12 @@ void EdgeSE2Switchable::computeError()
 }
 
 
+#include <GL/gl.h>
 #ifdef G2O_HAVE_OPENGL
   EdgeSE2SwitchableDrawAction::EdgeSE2SwitchableDrawAction(): DrawAction(typeid(EdgeSE2Switchable).name()){}
 
   g2o::HyperGraphElementAction* EdgeSE2SwitchableDrawAction::operator()(g2o::HyperGraph::HyperGraphElement* element,
-               g2o::HyperGraphElementAction::Parameters* /*params_*/){
+               g2o::HyperGraphElementAction::Parameters* ){
     if (typeid(*element).name()!=_typeName)
       return 0;
     EdgeSE2Switchable* e =  static_cast<EdgeSE2Switchable*>(element);
@@ -116,7 +118,7 @@ void EdgeSE2Switchable::computeError()
     g2o::VertexSE2* toEdge   = static_cast<g2o::VertexSE2*>(e->vertices()[1]);
     VertexSwitchLinear* s   = static_cast<VertexSwitchLinear*>(e->vertices()[2]);
 
-    glColor3f(s->estimate()*1.0,s->estimate()*0.1,s->estimate()*0.1);
+    glColor3f(1000.0,0.0,0.0);//(s->estimate()*1.0,s->estimate()*0.1,s->estimate()*0.1);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);

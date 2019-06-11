@@ -1,9 +1,18 @@
 #include "edge_switchPrior.h"
 using namespace std;
 
+    EdgeSwitchPrior::EdgeSwitchPrior()
+    {
+    	setMeasurement(1.0);
+    }
+
     bool EdgeSwitchPrior::read(std::istream &is)
     {
-      is >> measurement();
+      double new_measurement;
+      is >> new_measurement;
+
+      setMeasurement(new_measurement);
+
       is >> information()(0,0);
       return true;
     }
@@ -12,6 +21,12 @@ using namespace std;
     {
       os << measurement() << " " << information()(0,0);
       return true;
+    }
+
+    void EdgeSwitchPrior::setMeasurement(const double & m)
+    {
+    	g2o::BaseEdge<1, double>::setMeasurement(m);
+    	information()(0,0) = 1.0;
     }
 
     void EdgeSwitchPrior::linearizeOplus()

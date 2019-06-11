@@ -10,10 +10,13 @@ class EdgeSwitchPrior : public g2o::BaseUnaryEdge<1, double, VertexSwitchLinear>
 {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    EdgeSwitchPrior() {};
+    EdgeSwitchPrior();
 
     virtual bool read(std::istream& is);
     virtual bool write(std::ostream& os) const;
-    void linearizeOplus();
+
+    virtual void setMeasurement(const double & m);
+
+    virtual void linearizeOplus();
     void computeError();
 };

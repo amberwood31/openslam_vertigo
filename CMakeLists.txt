@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-
+set (CMAKE_CXX_STANDARD 11)
 project (vertigo)
 
 # we have our own find script for g2o
@@ -21,4 +21,4 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fPIC -ggdb")
 
 
 add_subdirectory(src)
-add_subdirectory(examples)
+#add_subdirectory(examples)

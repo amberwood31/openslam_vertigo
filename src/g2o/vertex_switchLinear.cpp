@@ -3,12 +3,22 @@
  *
  *  Created on: 17.10.2011
  *      Author: niko
+ *
+ *  Updated on: 14.01.2013
+ *      Author: Christian Kerl <christian.kerl@in.tum.de>
  */
 
 #include "vertex_switchLinear.h"
 #include <iostream>
 
 using namespace std;
+
+    VertexSwitchLinear::VertexSwitchLinear() :
+		_x(0)
+    {
+    	setToOrigin();
+    	setEstimate(1.0);
+    }
 
     bool VertexSwitchLinear:: read(std::istream& is)
     {
@@ -24,21 +34,21 @@ using namespace std;
       return os.good();
     }
 
-    void VertexSwitchLinear::setToOrigin()
+    void VertexSwitchLinear::setToOriginImpl()
     {
       _x=0;
       _estimate=_x;
     }
 
 
-    void VertexSwitchLinear::setEstimate(double &et)
+    void VertexSwitchLinear::setEstimate(const double &et)
     {
       _x=et;
       _estimate=_x;
     }
 
 
-    void VertexSwitchLinear::oplus(double* update)
+    void VertexSwitchLinear::oplusImpl(const double* update)
     {
       _x += update[0];
 
