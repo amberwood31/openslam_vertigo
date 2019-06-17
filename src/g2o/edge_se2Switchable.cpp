@@ -118,7 +118,7 @@ void EdgeSE2Switchable::computeError()
     g2o::VertexSE2* toEdge   = static_cast<g2o::VertexSE2*>(e->vertices()[1]);
     VertexSwitchLinear* s   = static_cast<VertexSwitchLinear*>(e->vertices()[2]);
 
-    glColor3f(1000.0,0.0,0.0);//(s->estimate()*1.0,s->estimate()*0.1,s->estimate()*0.1);
+    glColor3f(s->estimate()*1.0,s->estimate()*0.1,s->estimate()*0.1);
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glBegin(GL_LINES);

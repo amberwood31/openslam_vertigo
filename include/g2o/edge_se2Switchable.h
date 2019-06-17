@@ -11,6 +11,9 @@
 #ifndef EDGE_SE2SWITCHABLE_H_
 #define EDGE_SE2SWITCHABLE_H_
 
+#define G2O_HAVE_OPENGL
+
+
 #include "g2o/types/slam2d/vertex_se2.h"
 #include "g2o/core/base_multi_edge.h"
 #include "g2o/core/hyper_graph_action.h"
